@@ -1,1 +1,4 @@
 /venv
+/.venv-built
+/lambda.zip
+/.added-to-zip
