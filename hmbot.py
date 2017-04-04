@@ -12,7 +12,7 @@ nlp = spacy.load('en')
 def api_call(method, **kwargs):
     """
     Perform a Slack Web API call. It is supposed to have roughly the same
-    semantics as the official slackclient Python library, but 
+    semantics as the official slackclient Python library, but
     """
     kwargs['token'] = slack_token
     r = requests.post("https://slack.com/api/" + method, data=kwargs)
@@ -35,9 +35,9 @@ def handle_post(message):
     if message['token'] != verification_token:
         logger.error(f"verification token {message['token']} is wrong")
         return
-        
+
     t = message['type']
-    
+
     if t == 'url_verification':
         return message['challenge']
     elif t == 'event_callback':
