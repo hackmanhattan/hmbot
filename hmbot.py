@@ -1,32 +1,18 @@
 import json, re, requests, os, sys, logging
 
-logging.basicConfig()
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('hmbot')
-logger.setLevel(logging.INFO)
 
-from slackclient import SlackClient
-sc = SlackClient(os.environ['SLACK_TOKEN'])
+slack_token = os.environ['SLACK_TOKEN']
 
-def lambda_handler(event, context):
-    body = event['body']
-    slack_msg = json.loads(body)
-    event_type = slack_msg['type']
-    
-    if event_type == u'url_verification':
-        return {
-            'statusCode': 200,
-            'body': slack_event['challenge']
-        }
-    else:
-        try:
-            handle_msg(slack_msg)
-        except:
-            logger.error("error handling slack message", exc_info=True)
-
-        return {
-            'statusCode': 200,
-            'body': ''
-        }
+def api_call(method, **kwargs):
+    kwargs['token'] = slack_token
+    r = requests.post("https://slack.com/api/" + method, data=kwargs)
+    r.raise_for_status()
+    response = r.json()
+    if not response.get('ok'):
+        raise Exception(f"Slack error: {response.get('error')}")
+    return response
 
 def handle_msg(slack_msg):
     if 'event' not in slack_msg: return

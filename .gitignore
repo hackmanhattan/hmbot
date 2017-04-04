@@ -2,3 +2,4 @@
 /.venv-built
 /lambda.zip
 /.added-to-zip
+__pycache__
