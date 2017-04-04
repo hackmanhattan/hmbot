@@ -47,4 +47,4 @@ def slack_event_api():
     return ''
 
 # Auto reloading doesn't work that well because it crashes if you have a typo.
-bottle.run(host='0.0.0.0', port=8080, reload=True)
+bottle.run(host='0.0.0.0', port=os.environ.get('PORT', 8080), reload=True)
