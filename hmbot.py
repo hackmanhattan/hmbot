@@ -2,8 +2,10 @@ import json, re, requests, os, sys, logging, bottle
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('hmbot')
+logger.setLevel(logging.DEBUG)
 
-slack_token = os.environ['SLACK_TOKEN']
+slack_token         = os.environ['SLACK_TOKEN']
+verification_token  = os.environ['VERIFICATION_TOKEN']
 
 def api_call(method, **kwargs):
     """
@@ -23,28 +25,36 @@ def api_call(method, **kwargs):
 
     return response
 
-def handle_msg(slack_msg):
-    if 'event' not in slack_msg: return
+def handle_message(message):
+    if 'type' not in message:
+        logger.info(f"type missing in message {message}")
+        return
 
-    logger.info("slack message is: " + repr(slack_msg))
-
-    event = slack_msg['event']
-
-    # No idea what it means when type is not present.
-    if 'type' not in event: return
-    t = event['type']
-
-    if t == 'message' and 'subtype' not in event:
-        words = event['text'].lower().split()
-        if 'hmbot' in words:
-            logger.info("I would say hello here")
+    if message['token'] != verification_token:
+        logger.error(f"verification token {message['token']} is wrong")
+        return
         
+    t = message['type']
+    
+    if t == 'url_verification':
+        return message['challenge']
+    elif t == 'event_callback':
+        return handle_event(message['event'])
+    else:
+        logger.debug(f"unknown message type {t} in message {message}")
+
+def handle_event(event):
+    logger.info(f"handling event {event}")
+
 @bottle.post('/')
 def slack_event_api():
     # bottle is nice and simply but has a horrible design where request and
     # response are global objects.
-    logger.debug("Received JSON object " + bottle.request.json)
-    return ''
+    try:
+        return handle_message(bottle.request.json) or ''
+    except:
+        logger.error("Error in handle_event", exc_info=True)
+        return ''
 
 # Auto reloading doesn't work that well because it crashes if you have a typo.
 bottle.run(host='0.0.0.0', port=os.environ.get('PORT', 8080), reload=True)
