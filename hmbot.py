@@ -5,9 +5,6 @@ logger = logging.getLogger('hmbot')
 
 slack_token = os.environ['SLACK_TOKEN']
 
-# Secret that we place in the URL so strangers can't call us.
-event_secret = os.environ['SLACK_EVENT_SECRET']
-
 def api_call(method, **kwargs):
     """
     Perform a Slack Web API call. It is supposed to have roughly the same
@@ -42,7 +39,7 @@ def handle_msg(slack_msg):
         if 'hmbot' in words:
             logger.info("I would say hello here")
         
-@bottle.post('/' + event_secret)
+@bottle.post('/')
 def slack_event_api():
     # bottle is nice and simply but has a horrible design where request and
     # response are global objects.
@@ -50,4 +47,4 @@ def slack_event_api():
     return ''
 
 # Auto reloading doesn't work that well because it crashes if you have a typo.
-bottle.run(host='localhost', port=8080, reload=True)
+bottle.run(host='0.0.0.0', port=8080, reload=True)
