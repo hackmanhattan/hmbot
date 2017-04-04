@@ -5,5 +5,4 @@ COPY . /root/hmbot
 WORKDIR /root/hmbot
 RUN python3.6 -m pip install --upgrade pip
 RUN python3.6 -m pip install -r requirements.txt
-EXPOSE 8080
-CMD python3.6 hmbot.py
+CMD ["python3.6", "hmbot.py"]
