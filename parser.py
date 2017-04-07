@@ -33,7 +33,8 @@ class Parser:
                 okay, value = handler(tokens, *args)
                 if okay:
                     return value
-            except:
+            except Exception as ex:
+                logger.exception(ex)
                 # We do not care if some handler blows chunks.
                 pass
         raise NotHandled()
@@ -67,6 +68,7 @@ class Stream:
 
 def make_handler(rules, func, ignore, remove):
     def handler(tokens, *args):
+        logger.debug(f"Testing '{func.__name__}'")
         stream = Stream(tokens, ignore, remove)
         for rule in rules:
             ret = rule(stream)
