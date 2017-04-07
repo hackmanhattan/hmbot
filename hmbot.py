@@ -10,7 +10,7 @@ logger.setLevel(logging.DEBUG)
 
 parser = Parser(ignore=(','))
 
-greetings = ('hello', 'hi', 'greetings', 'howdy', '你好', 'goddag', 'hej', 'hejsa', 'hey', 'sup')
+greetings = ('hello', 'hi', 'greetings', 'howdy', '你好', 'goddag', 'hej', 'hejsa', 'hey', 'sup', 'yo')
 verbose_request = ('will you please', 'can you please', 'will you', 'can you', 'please')
 
 @parser.action(maybe(oneof(*greetings)), "hmbot", maybe(oneof(*verbose_request)), oneof("choose between", "choose"), maybe(":"))
