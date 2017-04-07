@@ -72,7 +72,7 @@ def handle_message(event):
     logger.debug(f"received event {event}")
     return hmbot.handle_message(event, api_call)
 
-@bottle.post('/')
+@bottle.post('/eb83190ba19fb434e1bc7ed1b0074497df834db1debe093f97b36cd5b3262c31')
 def slack_event_api():
     # bottle is nice and simply but has a horrible design where request and
     # response are global objects.
