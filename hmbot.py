@@ -22,6 +22,11 @@ def choose(tokens, msg, api_call):
         choice = "FAIL!"
     api_call('chat.postMessage', channel=msg['channel'], text=choice)
 
+@parser.action(maybe(oneof(*greetings)), oneof("I am", "I'm", "Im"), "hmbot")
+def no_im_hmbot(text, msg, api_call):
+    api_call('chat.postMessage', channel=msg['channel'], text='Liar!')
+    return False
+
 @parser.action(oneof(*greetings), "hmbot")
 def hello(text, msg, api_call):
     api_call('chat.postMessage', channel=msg['channel'], text='Hello, I am hmbot!')
