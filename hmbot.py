@@ -25,6 +25,10 @@ def choose(tokens, msg, api_call):
         choice = "FAIL!"
     api_call('chat.postMessage', channel=msg['channel'], text=choice)
 
+@parser.action(maybe(oneof(*greetings)), "hmbot", oneof("i love you", "i am in love with you"))
+def i_love_you(tokens, msg, api_call):
+    api_call('chat.postMessage', channel=msg['channel'], text=":heart:")
+
 @parser.action(maybe(oneof(*greetings)), "hmbot", oneof("whats happening", "what are the haps"))
 def what_are_the_haps(text, msg, api_call):
     rsp = requests.get(meetup_events)
