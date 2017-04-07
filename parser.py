@@ -28,9 +28,13 @@ class Parser:
     def parse(self, text, *args):
         tokens = [str(token).lower() for token in nlp(text)]
         for handler in self.handlers:
-            okay, value = handler(tokens, *args)
-            if okay:
-                return value
+            try:
+                okay, value = handler(tokens, *args)
+                if okay:
+                    return value
+            except:
+                # We do not care if some handler blows chunks.
+                pass
         raise NotHandled()
 
 class Stream:
