@@ -20,7 +20,7 @@ def choose(tokens, msg, api_call):
         choice = random.choice(choices)
     else:
         choice = "FAIL!"
-    return choice + "\n"
+    api_call('chat.postMessage', channel=msg['channel'], text=choice)
 
 @parser.action(oneof(*greetings), "hmbot")
 def hello(text, msg, api_call):
