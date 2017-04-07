@@ -15,14 +15,15 @@ class NotHandled(Exception):
     pass
 
 class Parser:
-    def __init__(self, ignore=None):
+    def __init__(self, ignore=None, remove=None):
+        self.remove = tuple(str(e).lower() for e in remove) or ()
         self.ignore = tuple(str(e).lower() for e in ignore) or ()
         self.handlers = []
 
     def action(self, *args):
         args = tuple(match(arg) if type(arg) == str else arg for arg in args)
         def dec(func):
-            self.handlers.append(make_handler(args, func, self.ignore))
+            self.handlers.append(make_handler(args, func, self.ignore, self.remove))
         return dec
 
     def parse(self, text, *args):
@@ -38,10 +39,11 @@ class Parser:
         raise NotHandled()
 
 class Stream:
-    def __init__(self, tokens, ignore):
+    def __init__(self, tokens, ignore, remove):
         self.offset = 0
         self.tokens = tokens
         self.ignore = ignore
+        self.remove = remove
 
     def abort(self):
         raise BackTrack()
@@ -55,15 +57,17 @@ class Stream:
             self.offset += 1
             if token in self.ignore:
                 continue
+            for s in self.remove:
+                token = token.replace(s, '')
             return token
         raise StopIteration()
 
     def __str__(self):
         return f"Stream(offset={self.offset}, tokens={self.tokens}, ignore={self.ignore})"
 
-def make_handler(rules, func, ignore):
+def make_handler(rules, func, ignore, remove):
     def handler(tokens, *args):
-        stream = Stream(tokens, ignore)
+        stream = Stream(tokens, ignore, remove)
         for rule in rules:
             ret = rule(stream)
             if not ret:
