@@ -11,6 +11,16 @@ logger.setLevel(logging.DEBUG)
 parser = Parser(ignore=(','))
 
 greetings = ('hello', 'hi', 'greetings', 'howdy', '你好', 'goddag', 'hej', 'hejsa', 'hey', 'sup')
+verbose_request = ('will you please', 'can you please', 'will you', 'can you', 'please')
+
+@parser.action(maybe(oneof(*greetings)), "hmbot", maybe(oneof(*verbose_request)), oneof("choose between", "choose"), maybe(":"))
+def choose(tokens, msg, api_call):
+    choices = [e.strip() for e in ' '.join(tokens).split(',')]
+    if choices:
+        choice = random.choice(choices)
+    else:
+        choice = "FAIL!"
+    return choice + "\n"
 
 @parser.action(oneof(*greetings), "hmbot")
 def hello(text, msg, api_call):
