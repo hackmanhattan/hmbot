@@ -1,16 +1,16 @@
 """
 Endpoint for calls made from the Slack Events API.
 """
-import json, re, requests, os, sys, logging, bottle
+import json, re, requests, os, sys, logging, bottle, sqlite3
 import hmbot, api.slack
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('endpoint')
 logger.setLevel(logging.DEBUG)
 
+db_path            = os.environ['SQLITE_DB']
 api.slack.token    = os.environ['SLACK_TOKEN']
 verification_token = os.environ['VERIFICATION_TOKEN']
-
 
 def handle_post(message):
     if 'type' not in message:
@@ -53,7 +53,7 @@ def handle_message(event):
         return
 
     logger.debug(f"received event {event}")
-    return hmbot.handle_message(event)
+    return hmbot.handle_message(event, db=conn)
 
 @bottle.post('/eb83190ba19fb434e1bc7ed1b0074497df834db1debe093f97b36cd5b3262c31')
 def slack_event_api():
@@ -67,5 +67,7 @@ def slack_event_api():
 
 # Auto reloading doesn't work that well because it crashes if you have a typo.
 if __name__ == '__main__':
+    conn = sqlite3.connect(db_path)
+    hmbot.db.setup(conn)
     bottle.run(host='0.0.0.0', port=8080)
 

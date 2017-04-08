@@ -26,11 +26,11 @@ class Parser:
             self.handlers.append(make_handler(args, func, self.ignore, self.remove))
         return dec
 
-    def parse(self, text, *args):
+    def parse(self, text, *args, **kwargs):
         tokens = [str(token).lower() for token in nlp(text)]
         for handler in self.handlers:
             try:
-                okay, value = handler(tokens, *args)
+                okay, value = handler(tokens, *args, **kwargs)
                 if okay:
                     return value
             except StopIteration:
@@ -68,14 +68,14 @@ class Stream:
         return f"Stream(offset={self.offset}, tokens={self.tokens}, ignore={self.ignore})"
 
 def make_handler(rules, func, ignore, remove):
-    def handler(tokens, *args):
+    def handler(tokens, *args, **kwargs):
         logger.debug(f"Testing '{func.__name__}'")
         stream = Stream(tokens, ignore, remove)
         for rule in rules:
             ret = rule(stream)
             if not ret:
                 return False, None
-        return True, func(stream.rest(), *args)
+        return True, func(stream.rest(), *args, **kwargs)
     return handler
 
 @contextmanager
@@ -97,7 +97,7 @@ def match(string):
     def action(stream):
         for part in rule:
             token = next(stream)
-            logger.debug(f'match {token} {part}')
+            # logger.debug(f'match {token} {part}')
             if token != part:
                 return False
         return True
