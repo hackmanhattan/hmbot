@@ -2,32 +2,15 @@
 Endpoint for calls made from the Slack Events API.
 """
 import json, re, requests, os, sys, logging, bottle
-import hmbot
+import hmbot, api.slack
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('endpoint')
 logger.setLevel(logging.DEBUG)
 
-slack_token         = os.environ['SLACK_TOKEN']
-verification_token  = os.environ['VERIFICATION_TOKEN']
+api.slack.token    = os.environ['SLACK_TOKEN']
+verification_token = os.environ['VERIFICATION_TOKEN']
 
-def api_call(method, **kwargs):
-    """
-    Perform a Slack Web API call. It is supposed to have roughly the same
-    semantics as the official slackclient Python library, but
-    """
-    kwargs['token'] = slack_token
-    r = requests.post("https://slack.com/api/" + method, data=kwargs)
-    r.raise_for_status()
-    response = r.json()
-    if not response.get('ok'):
-        logger.error(f"Slack error: {response.get('error')}")
-        raise Exception(f"Slack error: {response.get('error')}")
-
-    if response.get('warning'):
-        logger.warning(f"Slack warning: {response.get('warning')}")
-
-    return response
 
 def handle_post(message):
     if 'type' not in message:
@@ -70,7 +53,7 @@ def handle_message(event):
         return
 
     logger.debug(f"received event {event}")
-    return hmbot.handle_message(event, api_call)
+    return hmbot.handle_message(event)
 
 @bottle.post('/eb83190ba19fb434e1bc7ed1b0074497df834db1debe093f97b36cd5b3262c31')
 def slack_event_api():
