@@ -33,9 +33,10 @@ class Parser:
                 okay, value = handler(tokens, *args)
                 if okay:
                     return value
+            except StopIteration:
+                pass
             except Exception as ex:
                 logger.exception(ex)
-                # We do not care if some handler blows chunks.
                 pass
         raise NotHandled()
 
