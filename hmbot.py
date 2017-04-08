@@ -49,7 +49,7 @@ def what_are_the_haps(text, msg, api_call):
                 "fields" : [
                     {
                         "title" : "When",
-                        "value" : f"<!date^{time}^{{date_short}}|unparsable>",
+                        "value" : f"<!date^{time}^{{date_short}} @ {{time}}|unparsable>",
                         "short" : True
                     },
                     {
