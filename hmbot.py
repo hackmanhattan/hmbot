@@ -26,9 +26,13 @@ def choose(tokens, msg):
         choice = "FAIL!"
     api.slack.respond(msg, choice)
 
+@parser.action(maybe(oneof(*greetings)), "hmbot", "i hate you")
+def i_hate_you(tokens, msg):
+    api.slack.respond(msg, ":broken_heart:")
+
 @parser.action(maybe(oneof(*greetings)), "hmbot", oneof("i love you", "i am in love with you"))
 def i_love_you(tokens, msg):
-    api.slack.respond(":heart:")
+    api.slack.respond(msg, ":heart:")
 
 @parser.action(maybe(oneof(*greetings)), "hmbot", oneof("whats happening", "what are the haps"), "?")
 def what_are_the_haps(text, msg):
