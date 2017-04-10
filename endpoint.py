@@ -1,7 +1,7 @@
 """
 Endpoint for calls made from the Slack Events API.
 """
-import json, re, requests, os, sys, logging, bottle, sqlite3
+import json, re, requests, os, sys, logging, bottle, time, sqlite3, multiprocessing
 import hmbot, api.slack
 
 logging.basicConfig(level=logging.DEBUG)
@@ -11,6 +11,8 @@ logger.setLevel(logging.DEBUG)
 db_path            = os.environ['SQLITE_DB']
 api.slack.token    = os.environ['SLACK_TOKEN']
 verification_token = os.environ['VERIFICATION_TOKEN']
+
+queue = multiprocessing.Queue()
 
 def handle_post(message):
     if 'type' not in message:
@@ -53,7 +55,7 @@ def handle_message(event):
         return
 
     logger.debug(f"received event {event}")
-    return hmbot.handle_message(event, db=conn)
+    return hmbot.handle_message(event, db=conn, queue=queue)
 
 @bottle.post('/eb83190ba19fb434e1bc7ed1b0074497df834db1debe093f97b36cd5b3262c31')
 def slack_event_api():
@@ -65,9 +67,24 @@ def slack_event_api():
         logger.error("Error in handle_event", exc_info=True)
         return ''
 
+def msgpump(queue):
+    states = {}
+    while True:
+        msg = queue.get()
+        if msg is None:
+            time.sleep(0.1)
+        else:
+            func = hmbot.ext_func_table.get(msg.command)
+            state = states.setdefault(msg.state_id, {})
+            state.update(msg.state)
+            func(state, *msg.args, **msg.kwargs)
+
 # Auto reloading doesn't work that well because it crashes if you have a typo.
 if __name__ == '__main__':
     conn = sqlite3.connect(db_path)
     hmbot.db.setup(conn)
+
+    child = multiprocessing.Process(target=msgpump, args=[queue])
+    child.start()
     bottle.run(host='0.0.0.0', port=8080)
 
