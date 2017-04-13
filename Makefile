@@ -1,4 +1,4 @@
-PYTHON				= python3.6
+PYTHON = python3.6
 
 .PHONY: venv
 venv: .venv-built
