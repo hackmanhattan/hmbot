@@ -1,9 +1,16 @@
+"""
+Wrapper for Meetup API calls.
+"""
+
 import requests
 from html2text import html2text
 
 meetup_events = "https://api.meetup.com/{org}/events?&sign=true&photo-host=public&page={limit}"
 
 def _make_event_attachment(event):
+    """
+    Format Meetup event json blob into a slack attachment.
+    """
     try:
         time = str(event['time'])[:10]
     except:
@@ -43,12 +50,21 @@ def _make_event_attachment(event):
     return attachment
 
 def events(org, limit):
-    url = meetup_events.format(org=org, limit=limit)
-    rsp = requests.get(url)
-    if rsp.status_code != requests.codes.ok:
-        return False, rsp.status_code
+    """
+    Fetches a list of meetup events and returns them formated as Slack attachments.
 
-    events = rsp.json()
-    attachments = [_make_event_attachment(event) for event in events]
-    return True, attachments
+    Returns `True, [Attachment]` if everything went okay,
+            `False, http_status` if something went wrong,
+            `False, -1`          if something went really wrong.
+    """
+    try:
+        url = meetup_events.format(org=org, limit=limit)
+        rsp = requests.get(url)
+        if rsp.status_code != requests.codes.ok:
+            return False, rsp.status_code
+        events = rsp.json()
+        attachments = [_make_event_attachment(event) for event in events]
+        return True, attachments
+    except:
+        return False, -1
 

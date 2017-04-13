@@ -1,3 +1,7 @@
+"""
+Does some really simple parsing of slack messages to determine what actions hmbot should take.
+"""
+
 import logging
 from contextlib import contextmanager
 import spacy
@@ -9,9 +13,11 @@ logger.setLevel(logging.DEBUG)
 nlp = spacy.load('en')
 
 class BackTrack(Exception):
+    """Used to drive the backtracking logic."""
     pass
 
 class NotHandled(Exception):
+    """Raised when no action or command corresponds to an input."""
     pass
 
 class Parser:
@@ -24,6 +30,7 @@ class Parser:
         args = tuple(match(arg) if type(arg) == str else arg for arg in args)
         def dec(func):
             self.handlers.append(make_handler(args, func, self.ignore, self.remove))
+            return func
         return dec
 
     def parse(self, text, *args, **kwargs):

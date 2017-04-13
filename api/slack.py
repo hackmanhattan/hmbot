@@ -1,3 +1,7 @@
+"""
+Wrapper for Slack API calls.
+"""
+
 import logging, json
 import requests
 
@@ -39,7 +43,16 @@ def respond(msg, text, **kwargs):
         logger.warn(f'"text" given as kwarg: {kwargs["text"]}')
     if 'channel' in kwargs:
         logger.warn(f'"channel" given as kwarg: {kwargs["channel"]}')
+
+    # By default respond to the thread the message originated from.
+    if 'thread_id' in msg:
+        if kwargs.get('thread_ts') is None:
+            kwargs['thread_ts'] = msg['thread_ts']
     kwargs['text'] = text
     kwargs['channel'] = msg['channel']
     return call('chat.postMessage', **kwargs)
+
+def datetime_to_slacktime(dt):
+    ts = str(dt.timestamp())[:10]
+    return f"<!date^{ts}^{{date_short}} @ {{time}}|unparsable>"
 
