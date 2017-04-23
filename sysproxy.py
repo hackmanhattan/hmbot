@@ -115,7 +115,7 @@ def processes_to_attachments(processes):
                 },
                 {
                     "title" : "Creator",
-                    "value" : p.created_by,
+                    "value" : "@" + p.created_by,
                     "short" : True
                 },
                 {
