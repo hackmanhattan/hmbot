@@ -18,7 +18,8 @@ class BackTrack(Exception):
 
 class NotHandled(Exception):
     """Raised when no action or command corresponds to an input."""
-    pass
+    def __init__(self, tokens):
+        self.tokens = tokens
 
 class Parser:
     def __init__(self, ignore=None, remove=None):
@@ -45,7 +46,7 @@ class Parser:
             except Exception as ex:
                 logger.exception(ex)
                 pass
-        raise NotHandled()
+        raise NotHandled(tokens)
 
 class Stream:
     def __init__(self, tokens, ignore, remove):
