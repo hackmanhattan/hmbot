@@ -155,7 +155,7 @@ def i_love_you(tokens, msg, api=None, **kwargs):
     api.slack.respond(msg, ":heart:")
 
 @helper.usage("Yo hmbot, what are the happs?", command_type=Help.util)
-@parser.action(maybe(greetings), "hmbot", oneof("whats happening", "what are the haps"), "?")
+@parser.action(maybe(greetings), "hmbot", oneof("whats happening", "what are the haps", "what are the happs"), "?")
 def what_are_the_haps(text, msg, api=None, **kwargs):
     """Get a list of upcoming events from the hackmanhattan meetup."""
 
