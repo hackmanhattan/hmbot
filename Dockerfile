@@ -1,12 +1,19 @@
-FROM ubuntu:yakkety
-RUN apt-get update && apt-get install -y python3.6 python3.6-dev python3-pip \
-    netcat vim net-tools curl wget bsdgames libzmq5-dev
+FROM python:3.6
+WORKDIR /opt/hmbot
+ENV DEBIAN_FRONTEND noninteractive
 
-ADD requirements.txt /root/hmbot/requirements.txt
-RUN python3.6 -m pip install --upgrade pip
-RUN python3.6 -m pip install -r /root/hmbot/requirements.txt
+RUN groupadd hmbot -g 65533 \
+&& useradd -u 65533 -g hmbot -s /bin/bash -M -d /opt/hmbot hmbot
 
-ADD . /root/hmbot
-WORKDIR /root/hmbot
+RUN apt-get update \
+&& apt-get upgrade -y \
+&& apt-get install -y netcat vim net-tools curl wget bsdgames libzmq5-dev \
+&& rm -fr /var/lib/apt/lists/* /var/cache/apt/archives/*
 
-CMD python3.6 endpoint.py & python3.6 sysproxy.py
+COPY --chown=hmbot . /opt/hmbot
+RUN chown -R hmbot.hmbot /opt/hmbot
+
+USER hmbot
+RUN python3.6 -m pip install --upgrade pip --user
+RUN python3.6 -m pip install --no-cache-dir --user -r /opt/hmbot/requirements.txt
+CMD ["python3.6","endpoint.py","&","python3.6","sysproxy.py"]
