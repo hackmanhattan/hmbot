@@ -12,7 +12,7 @@ plac==0.9.6
 preshed==1.0.0
 pyparsing==2.2.0
 pyzmq==16.0.2
-requests==2.20.0
+requests==2.31.0
 six==1.10.0
 slackclient==1.0.5
 spacy==1.7.3
